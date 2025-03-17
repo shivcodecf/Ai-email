@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/drafts";
+const API_URL = "https://ai-email-8jgv.onrender.com/api/drafts";
 
 export default function Mail() {
   const [recipients, setRecipients] = useState("");
@@ -24,7 +24,7 @@ export default function Mail() {
 
     try {
 
-      const response = await fetch("http://localhost:5000/api/generate-email", {
+      const response = await fetch("https://ai-email-8jgv.onrender.com/api/generate-email", {
 
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,7 +80,7 @@ export default function Mail() {
 
         console.log("Sending formData:", formData); 
 
-        const response = await axios.post("http://localhost:5000/api/send-email", formData, {
+        const response = await axios.post("https://ai-email-8jgv.onrender.com/api/send-email", formData, {
             headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -106,7 +106,7 @@ export default function Mail() {
   return (
 
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
-      
+
       <h2 className="text-2xl font-bold mb-4 text-left">AI Email Generator</h2>
 
      
