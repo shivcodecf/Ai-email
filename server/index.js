@@ -11,10 +11,15 @@ const app = express();
 const PORT = 5000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Parse form data
 app.use(cors());
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// const storage = multer.memoryStorage();
+// const upload = multer({ storage });
+
+const upload = multer({ storage: multer.memoryStorage() }); 
+
+
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
@@ -112,56 +117,41 @@ app.post("/api/generate-email", async (req, res) => {
 
 
 app.post("/api/send-email", upload.array("attachments", 5), async (req, res) => {
-
     try {
-
-        console.log("📩 Email API hit!"); 
-
         const { recipients, subject, message } = req.body;
 
         if (!recipients || !subject || !message) {
-
             return res.status(400).json({ error: "All fields are required!" });
-
         }
 
         let attachments = [];
-
         if (req.files && req.files.length > 0) {
-
             attachments = req.files.map((file) => ({
                 filename: file.originalname,
                 content: file.buffer,
             }));
-
         }
 
         let transporter = nodemailer.createTransport({
-
             service: "gmail",
-
             auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
-
         });
 
         let mailOptions = {
-
             from: process.env.EMAIL_USER,
             to: recipients,
             subject,
             text: message,
             attachments,
-
         };
 
         await transporter.sendMail(mailOptions);
 
-        // Save email as draft automatically
+        // 🔹 Save email as draft automatically
         const newDraft = new Draft({ recipients, subject, message, attachments });
-
         await newDraft.save();
 
         res.status(200).json({ success: true, message: "Email sent & draft saved successfully!" });
@@ -171,6 +161,7 @@ app.post("/api/send-email", upload.array("attachments", 5), async (req, res) => 
         res.status(500).json({ error: "Failed to send email" });
     }
 });
+
 
 
 
@@ -273,7 +264,7 @@ app.delete("api/delete-draft/:id", async (req, res) => {
         res.status(200).json({ success: true, message: "Draft deleted successfully!" });
 
     } catch (error) {
-        
+
         res.status(500).json({ error: "Failed to delete draft" });
     }
 });

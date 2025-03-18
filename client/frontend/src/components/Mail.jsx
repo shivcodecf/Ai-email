@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API_URL = "https://ai-email-8jgv.onrender.com/api/drafts";
+const API_URL = "http://localhost:5000/api/drafts";
 
 export default function Mail() {
   const [recipients, setRecipients] = useState("");
@@ -24,7 +24,7 @@ export default function Mail() {
 
     try {
 
-      const response = await fetch("https://ai-email-8jgv.onrender.com/api/generate-email", {
+      const response = await fetch("http://localhost:5000/api/generate-email", {
 
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,53 +49,44 @@ export default function Mail() {
   };
 
   const sendEmail = async () => {
-
     if (!recipients.trim() || !subject.trim() || !generatedEmail.trim()) {
-
         alert("Please enter all fields before sending.");
         return;
-
     }
 
     const formData = new FormData();
-
     formData.append("recipients", recipients);
-
     formData.append("subject", subject);
-
     formData.append("message", generatedEmail);
 
-    
     if (files?.length) {
-
         files.forEach((file) => {
-            formData.append("attachments", file); 
+            formData.append("attachments", file);
         });
+    }
 
+    // 🔹 Debugging: Check if FormData has values
+    for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]); // Logs each key-value pair in FormData
     }
 
     try {
+        setLoading1(true); // Show loading effect
 
-       setLoading1(true); 
-
-        console.log("Sending formData:", formData); 
-
-        const response = await axios.post("https://ai-email-8jgv.onrender.com/api/send-email", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-        });
+        const response = await axios.post(
+            "http://localhost:5000/api/send-email",
+            formData
+        );
 
         alert(response.data?.message || "Email sent successfully!");
-
     } catch (error) {
-
         console.error("Email sending failed", error.response?.data || error);
         alert(error.response?.data?.error || "Failed to send email.");
-
     } finally {
-
-      setLoading1(false); 
-  }
+        setLoading1(false); // Hide loading effect
+    }
 };
+
 
 
 
