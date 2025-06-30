@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://ai-email-8jgv.onrender.com/api";
 
 
 export const saveDraft = async (formData) => {
@@ -16,7 +16,7 @@ export const getDrafts = async () => {
 
     try {
 
-        const response = await axios.get("http://localhost:5000/api/get-drafts");
+        const response = await axios.get("https://ai-email-8jgv.onrender.com/api/get-drafts");
 
         return response.data.drafts || []; 
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/drafts";
+const API_URL = "https://ai-email-8jgv.onrender.com/api/drafts";
 
 export default function Mail() {
 
@@ -25,7 +25,7 @@ export default function Mail() {
 
     try {
 
-      const response = await fetch("http://localhost:5000/api/generate-email", {
+      const response = await fetch("https://ai-email-8jgv.onrender.com/api/generate-email", {
 
         method: "POST",
 
@@ -100,7 +100,7 @@ export default function Mail() {
 
         const response = await axios.post(
 
-            "http://localhost:5000/api/send-email",
+            "https://ai-email-8jgv.onrender.com/api/send-email",
 
              formData
 
