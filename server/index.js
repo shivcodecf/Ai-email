@@ -11,7 +11,9 @@ const app = express();
 const PORT = 5000;
 
 app.use(express.json());
+
 app.use(express.urlencoded({ extended: true })); // Parse form data
+
 app.use(cors());
 
 // const storage = multer.memoryStorage();
@@ -23,12 +25,19 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
+
     useNewUrlParser: true,
+
     useUnifiedTopology: true,
+
 })
+
+
 .then(() => console.log(" MongoDB Connected"))
 
+
 .catch((error) => console.error("MongoDB Connection Error:", error));
+
 
 
 const emailSchema = new mongoose.Schema({
@@ -69,19 +78,23 @@ const Draft = mongoose.model("Draft", DraftSchema);
 
 
 
-// Generate Email Route
+
 app.post("/api/generate-email", async (req, res) => {
 
     try {
+
         const { recipients, subject, keyPoints } = req.body;
 
         if (!recipients || !subject || !keyPoints) {
+
             return res.status(400).json({ error: "Missing required fields" });
+
         }
          
 
         
         const geminiResponse = await axios.post(
+
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
             {
                 contents: [
@@ -94,7 +107,9 @@ app.post("/api/generate-email", async (req, res) => {
                     },
                 ],
             },
+
             { headers: { "Content-Type": "application/json" } }
+
         );
 
        
@@ -107,6 +122,7 @@ app.post("/api/generate-email", async (req, res) => {
 
         res.status(200).json({ success: true, generatedEmail });
 
+
     } catch (error) {
 
         console.error(" Error generating email:", error.message);
@@ -117,14 +133,19 @@ app.post("/api/generate-email", async (req, res) => {
 
 
 app.post("/api/send-email", upload.array("attachments", 5), async (req, res) => {
+
     try {
+
         const { recipients, subject, message } = req.body;
 
         if (!recipients || !subject || !message) {
+
             return res.status(400).json({ error: "All fields are required!" });
+
         }
 
         let attachments = [];
+
         if (req.files && req.files.length > 0) {
             attachments = req.files.map((file) => ({
                 filename: file.originalname,
@@ -141,25 +162,34 @@ app.post("/api/send-email", upload.array("attachments", 5), async (req, res) => 
         });
 
         let mailOptions = {
+
             from: process.env.EMAIL_USER,
             to: recipients,
             subject,
             text: message,
             attachments,
+
         };
+
 
         await transporter.sendMail(mailOptions);
 
-        // 🔹 Save email as draft automatically
+       
         const newDraft = new Draft({ recipients, subject, message, attachments });
+
         await newDraft.save();
 
         res.status(200).json({ success: true, message: "Email sent & draft saved successfully!" });
 
+
     } catch (error) {
+
         console.error("Error sending email:", error.message);
         res.status(500).json({ error: "Failed to send email" });
+
     }
+
+
 });
 
 
@@ -275,6 +305,6 @@ app.delete("api/delete-draft/:id", async (req, res) => {
 
 app.listen(PORT, () => {
 
-    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 
 });
